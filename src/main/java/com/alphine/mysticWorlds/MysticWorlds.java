@@ -65,8 +65,11 @@ public final class MysticWorlds extends JavaPlugin {
         cm.register(new ProbeSub(this, engine, dlog()));
         cm.bind("mysticworlds");
 
-        // 1) initial index (after listener exists)
-        gateListener.refreshIndex();
+        // After registering listeners/commands
+        Bukkit.getGlobalRegionScheduler().run(this, task -> {
+            gateListener.reloadFromConfig(configModel);
+            gateListener.refreshIndex();
+        });
 
         // 3) refresh when a new world loads/unloads at runtime
         getServer().getPluginManager().registerEvents(new org.bukkit.event.Listener() {
@@ -99,6 +102,7 @@ public final class MysticWorlds extends JavaPlugin {
         // After model changes, refresh the index if the listener already exists
         if (gateListener != null) {
             gateListener.refreshIndex();
+            gateListener.reloadFromConfig(configModel);
         }
 
         // Folia-safe: log effective rules next tick on the global region
