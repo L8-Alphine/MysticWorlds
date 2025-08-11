@@ -1,0 +1,166 @@
+# =========================
+#  MysticWorlds - Config
+# =========================
+# MiniMessage is supported in all messages (prefix, titles, actionbar, etc.)
+# https://docs.adventure.kyori.net/minimessage/format.html
+
+general:
+  # When true, only *listed* worlds are restricted (default).
+  # When false, all worlds are restricted EXCEPT those listed with restricted: false.
+  restricted-mode: listed
+  # any  = pass if ANY enabled rule passes
+  # all  = pass only if ALL enabled rules pass
+  rule-logic: any
+  # Persist players' /mwbypass state across restarts
+  remember-bypass: true
+  # Show deny reasons after the main denied message
+  show-deny-reasons: true
+  # Global cooldown to re-attempt entry after a deny (seconds)
+  # Per-world override supported below
+  deny-cooldown-seconds: 2
+  # Economy backend preference: auto | serviceio | vault
+  economy-backend: auto
+  # Fallback World if somehow players bypass world limit.
+  fallback-world: "world"
+
+# Aliases World Names
+aliases:
+  world_nether: "&cNether"
+  world_the_end: "&5The End"
+
+rules:
+  # --- Bypass rule ---
+  bypass:
+    enabled: true
+    permission: "mysticworlds.bypass"
+
+  # --- Permission rule ---
+  permission:
+    enabled: true
+    # If true, node is mysticworlds.access.<worldName>
+    per-world-node: true
+    # If false, we check this one node for all restricted worlds
+    custom-node: "mysticworlds.access"
+
+  # --- Items rule ---
+  items:
+    enabled: true
+    # If true, we consume matched items when entry succeeds
+    consume-on-pass: false
+    # Any-of sets: if ONE set matches fully, the Items rule passes
+    any_of:
+      # Example set #1: require an ENDER_PEARL with a PDC (NBT) tag
+      - match:
+          - material: "ENDER_PEARL"
+            amount: 1
+            pdc:
+              - key: "alphine:gate_key"
+                type: "STRING"   # STRING | INT | LONG | DOUBLE
+                value: "end_access"
+      # Example set #2: an alternative single item
+      - match:
+          - material: "NETHER_STAR"
+            amount: 1
+
+  # --- Placeholder rule ---
+  placeholder:
+    enabled: false
+    # Every entry here must pass when rule-logic = all (global),
+    # or contributes as one "pass" when rule-logic = any.
+    checks:
+    # - placeholder: "%auroralevels_level%"
+    #   type: "NUMBER_GTE"  # EQUALS | NOT_EQUALS | CONTAINS | MATCHES_REGEX | NUMBER_GTE | NUMBER_LTE
+    #   value: "50"
+
+  # --- Economy rule (optional cost to enter a world) ---
+  economy:
+    enabled: false
+    # Charge when: on-pass (only when allowed),
+    #              on-attempt (even if later blocked by another rule),
+    #              or none
+    charge-timing: "on-pass"
+    # Minimum balance requirement (checked before charge). 0 disables.
+    min-balance: 0
+    # Global entry cost. 0 disables.
+    cost: 0
+    # Refund on denial (only meaningful if charge-timing = on-attempt)
+    refund-on-deny: true
+
+# ---------------------
+# Per-world overrides
+# ---------------------
+# Any key under "worlds" must be the EXACT Bukkit world name.
+worlds:
+
+  the_end:
+    restricted: true
+    deny-cooldown-seconds: 2
+    rule-logic: all
+    rules:
+      permission:
+        enabled: true
+        per-world-node: true   # -> mysticworlds.access.the_end
+      items:
+        enabled: true
+        consume-on-pass: true
+        any_of:
+          - match:
+              - material: "ENDER_PEARL"
+                amount: 1
+                pdc:
+                  - key: "alphine:gate_key"
+                    type: "STRING"
+                    value: "end_access"
+      placeholder:
+        enabled: true
+        checks:
+          - placeholder: "%auroralevels_level%"
+            type: "NUMBER_GTE"
+            value: "50"
+      economy:
+        enabled: true
+        charge-timing: "on-pass"
+        min-balance: 0
+        cost: 500
+
+  world:
+    # Example: not restricted (explicit allow)
+    restricted: false
+
+  custom_world:
+    restricted: true
+    rules:
+      economy:
+        enabled: true
+        cost: 1000
+
+# ---------------------
+# Messages (MiniMessage)
+# ---------------------
+messages:
+  prefix: "<gradient:#87f5ff:#62ffa0>[MysticWorlds]</gradient> "
+  target_allowed_you_not: "<red>{target} can be there, but you do not meet the requirements.</red>"
+  nether_hint: "<yellow>Tip: complete the requirements before using a Nether portal.</yellow>"
+  forced_out: "<yellow>You were moved to a safe area.</yellow>"
+
+  # When access is denied
+  denied: "<red>You are not allowed to enter <white>{world}</white>.</red>"
+  reason:
+    bypass: "<gray>Bypass is off.</gray>"
+    permission: "<gray>Missing permission.</gray>"
+    items: "<gray>Required item(s) not found.</gray>"
+    placeholder: "<gray>Requirement not met.</gray>"
+    economy: "<gray>Insufficient funds.</gray>"
+    cooldown: "<gray>Please wait before trying again.</gray>"
+
+  # When access is allowed (optional)
+  allowed: "<green>Access granted to <white>{world}</white>.</green>"
+
+  # Economy feedback
+  charged: "<yellow>Entry fee: <white>{amount}</white>.</yellow>"
+  refunded: "<yellow>Your entry fee was refunded.</yellow>"
+  insufficient_funds: "<red>You need at least <white>{amount}</white> to enter.</red>"
+
+  # Bypass toggles
+  bypass_on: "<green>Bypass enabled.</green>"
+  bypass_off: "<yellow>Bypass disabled.</yellow>"

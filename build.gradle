@@ -1,0 +1,68 @@
+plugins {
+    id 'java'
+    id 'xyz.jpenilla.run-paper' version '2.3.1'
+    id 'com.gradleup.shadow' version '8.3.1'
+}
+
+group = 'com.alphine'
+version = '1.0.0-1.21.6-alpha.08'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc-repo'
+        url = uri('https://repo.papermc.io/repository/maven-public/')
+    }
+    maven {
+        name = 'tcoded-releases'
+        url = uri('https://repo.tcoded.com/releases')
+    }
+    maven {
+        url = uri('https://repo.extendedclip.com/releases/')
+    }
+    maven {
+        url = uri('https://repo.thenextlvl.net/releases')
+    }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.6-R0.1-SNAPSHOT'
+    implementation 'io.papermc:paperlib:1.0.7'
+    implementation 'com.tcoded:FoliaLib:0.5.1'
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+    // ServiceIO (Vault replacement for Folia)
+    compileOnly 'net.thenextlvl.services:service-io:2.3.1'
+    // Vault
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.runServer {
+    minecraftVersion('1.21.6')
+}
+
+tasks.shadowJar {
+    relocate 'com.tcoded.folialib', 'com.alphine.mysticWorlds.libs.folialib'
+    relocate 'io.papermc.paperlib', 'com.alphine.mysticWorlds.libs.paperlib'
+}
+
+tasks.build {
+    dependsOn tasks.shadowJar
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release.set(21)
+}
+
+processResources {
+    filesMatching('plugin.yml') {
+        expand(version: project.version)
+    }
+}

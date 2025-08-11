@@ -1,0 +1,36 @@
+name: MysticWorlds
+main: com.alphine.mysticWorlds.MysticWorlds
+version: ${version}
+api-version: '1.21'
+folia-supported: true
+authors: [ "Alphine" ]
+description: Restrict world access with permissions/items/PlaceholderAPI and optional economy costs (ServiceIO→Vault).
+softdepend:
+  - PlaceholderAPI
+  - Vault
+  - ServiceIO
+
+commands:
+  mysticworlds:
+    description: MysticWorlds main command.
+    usage: "/mysticworlds <subcommand>"
+    aliases: [ mw, worldlimit ]
+    permission: mysticworlds.use
+    permission-message: "§cYou don't have permission."
+
+permissions:
+  mysticworlds.use:
+    default: true
+    description: Allows basic use of /mysticworlds help.
+  mysticworlds.bypass:
+    default: op
+    description: Toggle world access bypass.
+  mysticworlds.reload:
+    default: op
+    description: Reload MysticWorlds config.
+  mysticworlds.debug:
+    default: op
+    description: Toggle debug output.
+  mysticworlds.access.*:
+    default: false
+    description: Per-world access node prefix (mysticworlds.access.<world>)
