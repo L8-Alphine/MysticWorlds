@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-public final class WorldGateListener implements Listener {
+public class WorldGateListener implements Listener {
     private final JavaPlugin plugin;
     private final RuleEngine engine;
     private final Consumer<String> dlog;
@@ -204,9 +204,16 @@ public final class WorldGateListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPortal(PlayerPortalEvent e) {
-        e.setCanCreatePortal(false);
-        e.setSearchRadius(Math.min(e.getSearchRadius(), 96));
-        onTeleport(e);
+        Player player = e.getPlayer();
+
+        if (!com.alphine.mysticWorlds.util.genUtils.validWorldChange(player)){
+            e.setCancelled(true);
+            arcPushback(player, player.getLocation());
+        }
+
+//        e.setCanCreatePortal(false);
+//        e.setSearchRadius(Math.min(e.getSearchRadius(), 96));
+//        onTeleport(e);
     }
 
     /* ---------- Backdoor guards ---------- */
