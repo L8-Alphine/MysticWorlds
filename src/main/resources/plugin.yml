@@ -23,7 +23,7 @@ permissions:
     default: true
     description: Allows basic use of /mysticworlds help.
   mysticworlds.bypass:
-    default: op
+    default: false
     description: Toggle world access bypass.
   mysticworlds.reload:
     default: op
